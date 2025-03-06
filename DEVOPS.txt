@@ -1,0 +1,55 @@
+Devops meaning Development + operation
+
+SDLC --> software Development Life cycle.
+------------------------------------------
+
+Requirment = we got a Requirment to Develop a calcualte.
+
+Analysis = now what we are going to do we are going to collect data what we are going to do and how we are going to do 
+
+Design = Now we are going to desing the plan by using the Analysis and Requirment.
+
+Developer = in this point we are going to build the code for the calcualte by uisng th desing.
+
+Testing = After devalopment we will test the calcualte the functionallty.
+
+verification and release = we will release the calcualte and monitor the functions if there is any issue we will provide the bug for that.
+
+
+Methodology
+-------------
+Waterfall Methodology
+waterfall Methodology is a inline Methodology what happend here if there is process it should continue as setps with out skip a step as example there is waterfall water coming down if we block the water path 
+what will happend water not coming down like wis if we skip a step then we could not contitune the step.
+
+Agile Methodology;
+in this method we can avoid the delay because in the up method we have to follow all step so there is a delay but in this preocess we no need to follow the setps we can just go 
+
+Devops Methodology:
+
+Dev stage:
+Planning : in this process we will gethers information from sprint and added to the task to jira and assigned to developers and testers.
+
+Development: in this we devaloper write the code and push it to git with the jira ticket number for better traceability then we can easly find the correct task push. for this we normally use 
+git(gihub,gitlab,bitbucket) IDE(Vscode)
+
+Build: in this we make the automation what it do it when the code is pushed to the repo, a jenkins job is triggered that coplies the code , run the unit test, and creat the build artifact like docker or jar files
+(in the build file it has the source code and dependance)
+
+Test:in this after the build process the jenkins trigger the junit to test the units test. if the test passed the build mark pass selenium may run end to end ui test 
+
+
+(CI) continuous : Every time the developer commit code to a GitHUb repository, Jenkins automatically pulls the code, runs the unit test, and check the the code quilty using SonarQube. if the quilty checks
+are successful, the build is deployed to staging environment for further testing. 
+
+Release: Once the tests pass, Jenkins triggers an automated deployment pipeline. The code is deployed to a staging environment using Docker containers and orchestrated with Kubernetes. 
+If everything works fine, the same process is used to deploy the code to production. 
+
+Monitoring : In the production environment, Prometheus collects metrics from the application and sends them to Grafana to create real-time 
+dashboards for tracking key performance indicators (KPIs) like server response times, CPU usage, memory, and application uptime.
+
+Continuous Delivery (CD) / Continuous Deployment : If the code passes all stages of testing and deployment to staging, it is automatically pushed to production. 
+A CD pipeline runs in Jenkins that checks for any new commits and automatically deploys them to production after validation.
+
+ Feedback & Optimization:  If there’s an issue in production, it’s logged in Jira, and the development team is notified through Slack. 
+ The feedback loop helps developers fix the issue in the next sprint, making the process iterative.
