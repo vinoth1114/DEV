@@ -1,3 +1,187 @@
-What is Ansible?
+What is Ansible ? 
+
+Ansible is an open-source automation tool used for IT configuration management, application Deployment, task automation. it helps to automat repetitive task such as system update, 
+service restart, and software installtion.
+
+In this we used yaml file to make automation(Playbooks).
+
+
+Core Concepts:
+---------------\\\
+inventory :inventory means the file where we store ip address or names of devices and servers it is jest a test file. 
+    if there limited number of hosts we can easy add to ip address or name to the inventory if there are many server then we have to write script to get dynamic ip address to inventory. this can be do in the cloud enveirments 
+    via respective API then it generate the dynamic inventory. 
+
+    for example : AWS instances, Ansible provides a dynamic inventory plugin that allows you to automatically generate an inventory based on the EC2 instances running in your account.
+
+Modules: Modules mean step of codes in binding block ways (modules: file = to create file, service = to start the server or stop, disable, enable, package: to install a package)
+    ex : There where we write code to install servers, start service, create files, move file and configure the services etc ...
+
+    There some key points:
+    ------------------------\\\
+    purpose: Modules automate specific tasks like file manipulation, package management, service control, and cloud provisioning.
+
+    No agent Needed: in this it work based on the code which we write for this we no need the any agent to give permission.
+
+    Idempotency : Most Ansible modules are idempotent, meaning running the same module multiple times won't cause unintended side effects. The system will only change if it's necessary.
+
+    
+    Types of the Ansible modules:
+    ------------------------------\\\
+    Core Modules: These modules come bundled with Ansible and are always available. Examples include package, service, copy, and file.
+
+    Extras Modules: These modules are not part of the core but are available for installation separately. They are usually related to 
+    specific technologies or external integrations (e.g., AWS, Docker, Kubernetes). Examples include ec2, docker_container, and k8s.
+
+    Custom Modules: You can also write your own custom modules if needed. These are useful if you have specific tasks that aren't covered by the built-in modules.
+
+Playbooks : Yaml files that define a set of task to be executed on managed nodes.
+    ex : here we write codes what should happend in the this automation task.
+
+Hosts: These are the machines or devices where tasks are applied
+
+
+Basic Setup:
+------------------\\\\
+
+Install the Ansible : First, you need to install Ansible on your local machine (control node) this is the central node.
+
+        yum install ansible (only control node) 
+
+        for managed nodes we have to install the ssh and allow the control node to access.
+
+After that create the inventory file in /etc/ansible/hosts if it is in the different location use -i to specify the location.
+
+        Example of the inventory: inventory.ini
+
+            [webservers] ---> Group name
+            web1.example.com
+            web2.example.com
+
+            [dbserver] 
+            192.168.1.1
+            192.168.2.1
+
+        ## we can use both 
+
+
+
+In Ansible, the term "ad-hoc" refers to one-time, quick commands or tasks that are executed on remote hosts without the need to create a playbook. Ad-hoc commands allow you to run simple tasks like managing packages, copying files, or gathering information from remote servers, all directly from the command line.
+
+Key Points About Ad-Hoc Commands:
+One-off Commands: Ad-hoc commands are typically used when you want to execute a task on a remote host or group of hosts without writing a full playbook.
+Quick Execution: These commands are executed instantly without the need for a detailed playbook, which makes them great for simple tasks or when you need to troubleshoot or make quick changes.
+Simple Syntax: Ad-hoc commands have a simple syntax, where you specify the host(s), the module to use, and the parameters for the module.
+
+
+Syntax to use Ad-hoc 
+----------------------\\\
+
+ansible <host-pattern> -i <inventory> -m <module> -a "<module-arguments>"
+
+example = ansible all -i inventory.ini -m ping
+          ansible all -i inventory.ini -m yum -a "name=nginx state=present"
+
+
+After setup the web server by usin ad-hoc command we just checked the storage usage 
+    ansible webserver -i inventory.ini -m command -a "df -h"
+
+
+Playbooks are written in YAML format. Here’s a simple playbook that installs Apache on a set of web servers.
+
+install_apache.yaml
+
+---
+- name: install Apache on Web Servers (this just name to dispaly what is happening in the automation)
+  hosts: webservers
+  become: yes (use 'Sudo ' to become the root user we can specify user like become_user: vinoth, become_method: sudo  )
+  task:
+    - name: install Apache
+      yum:
+        name: apache2
+        state: present
+    
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enable: yes
+
+
+Run the playbook:
+-----------------\\\
+
+ansible-playbook -i inventory.ini install_apache.yaml
+
+if we do not want to mentioned the inventory name then just add the inventory to ansible.cfg 
+
+ansible.cfg 
+[defaults]
+inventory = ./inventory.ini
+
+
+
+Example Copying files to server:
+
+copy_file.YAML
+---
+- name: copy a file to webservers
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: copy index.html file
+      copy: 
+        src: /local/path/index.html
+        dest: /var/www/html/index.html
+
+    ## what this do it copy the file from /local/path/index.html this location /var/www/html/index.html
+
+
+Example 4: Using Variables in Playbooks
+----------------------------------------\\\
+
+---
+- name: Install a package dynamically
+  hosts: webserver
+  become: yes or true (can one of this)
+  vars:
+    package_name: apache2
+  tasks:
+  - name: Install Apache or Nginx
+    apt:
+     name: "{{package_name}}"
+     state: present
+
+
+
+Example 5: Using Ansible Roles 
+As your playbooks grow larger, you may want to split them into reusable components called roles. Roles are a way to organize playbooks into separate directories.
+
+to create a role, use the ansible-galaxy init command 
+
+example = ansible-galaxy init myrole
+
+myrole/
+  ├── defaults/
+  ├── files/
+  ├── handlers/
+  ├── meta/
+  ├── tasks/
+  ├── templates/
+  └── vars/
+
+
+What is an Ansible Role?
+An Ansible Role is a way to organize and encapsulate playbook logic into reusable, modular components. Roles allow you to organize your tasks, variables, handlers, 
+and other resources into a structure that is easy to manage and reuse across different playbooks. This is especially useful in larger environments where you need to 
+apply the same configuration or setup to multiple servers.
+
+Roles help improve code reusability and readability by grouping together related tasks, handlers, templates, and files into well-defined directories.
+
+
+
+
+
+
 
 
