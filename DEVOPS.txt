@@ -1,55 +1,412 @@
-Devops meaning Development + operation
+What is Ansible ? 
 
-SDLC --> software Development Life cycle.
-------------------------------------------
+Ansible is an open-source automation tool used for IT configuration management, application Deployment, task automation. it helps to automat repetitive task such as system update, 
+service restart, and software installtion.
 
-Requirment = we got a Requirment to Develop a calcualte.
-
-Analysis = now what we are going to do we are going to collect data what we are going to do and how we are going to do 
-
-Design = Now we are going to desing the plan by using the Analysis and Requirment.
-
-Developer = in this point we are going to build the code for the calcualte by uisng th desing.
-
-Testing = After devalopment we will test the calcualte the functionallty.
-
-verification and release = we will release the calcualte and monitor the functions if there is any issue we will provide the bug for that.
+In this we used yaml file to make automation(Playbooks).
 
 
-Methodology
--------------
-Waterfall Methodology
-waterfall Methodology is a inline Methodology what happend here if there is process it should continue as setps with out skip a step as example there is waterfall water coming down if we block the water path 
-what will happend water not coming down like wis if we skip a step then we could not contitune the step.
+Core Concepts:
+---------------\\\
+inventory :inventory means the file where we store ip address or names of devices and servers it is jest a test file. 
+    if there limited number of hosts we can easy add to ip address or name to the inventory if there are many server then we have to write script to get dynamic ip address to inventory. this can be do in the cloud enveirments 
+    via respective API then it generate the dynamic inventory. 
 
-Agile Methodology;
-in this method we can avoid the delay because in the up method we have to follow all step so there is a delay but in this preocess we no need to follow the setps we can just go 
+    for example : AWS instances, Ansible provides a dynamic inventory plugin that allows you to automatically generate an inventory based on the EC2 instances running in your account.
 
-Devops Methodology:
+Modules: Modules mean step of codes in binding block ways (modules: file = to create file, service = to start the server or stop, disable, enable, package: to install a package)
+    ex : There where we write code to install servers, start service, create files, move file and configure the services etc ...
 
-Dev stage:
-Planning : in this process we will gethers information from sprint and added to the task to jira and assigned to developers and testers.
+    There some key points:
+    ------------------------\\\
+    purpose: Modules automate specific tasks like file manipulation, package management, service control, and cloud provisioning.
 
-Development: in this we devaloper write the code and push it to git with the jira ticket number for better traceability then we can easly find the correct task push. for this we normally use 
-git(gihub,gitlab,bitbucket) IDE(Vscode)
+    No agent Needed: in this it work based on the code which we write for this we no need the any agent to give permission.
 
-Build: in this we make the automation what it do it when the code is pushed to the repo, a jenkins job is triggered that coplies the code , run the unit test, and creat the build artifact like docker or jar files
-(in the build file it has the source code and dependance)
+    Idempotency : Most Ansible modules are idempotent, meaning running the same module multiple times won't cause unintended side effects. The system will only change if it's necessary.
 
-Test:in this after the build process the jenkins trigger the junit to test the units test. if the test passed the build mark pass selenium may run end to end ui test 
+    
+    Types of the Ansible modules:
+    ------------------------------\\\
+    Core Modules: These modules come bundled with Ansible and are always available. Examples include package, service, copy, and file.
+
+    Extras Modules: These modules are not part of the core but are available for installation separately. They are usually related to 
+    specific technologies or external integrations (e.g., AWS, Docker, Kubernetes). Examples include ec2, docker_container, and k8s.
+
+    Custom Modules: You can also write your own custom modules if needed. These are useful if you have specific tasks that aren't covered by the built-in modules.
+
+Playbooks : Yaml files that define a set of task to be executed on managed nodes.
+    ex : here we write codes what should happend in the this automation task.
+
+Hosts: These are the machines or devices where tasks are applied
 
 
-(CI) continuous : Every time the developer commit code to a GitHUb repository, Jenkins automatically pulls the code, runs the unit test, and check the the code quilty using SonarQube. if the quilty checks
-are successful, the build is deployed to staging environment for further testing. 
+Basic Setup:
+------------------\\\\
 
-Release: Once the tests pass, Jenkins triggers an automated deployment pipeline. The code is deployed to a staging environment using Docker containers and orchestrated with Kubernetes. 
-If everything works fine, the same process is used to deploy the code to production. 
+Install the Ansible : First, you need to install Ansible on your local machine (control node) this is the central node.
 
-Monitoring : In the production environment, Prometheus collects metrics from the application and sends them to Grafana to create real-time 
-dashboards for tracking key performance indicators (KPIs) like server response times, CPU usage, memory, and application uptime.
+        yum install ansible (only control node) 
 
-Continuous Delivery (CD) / Continuous Deployment : If the code passes all stages of testing and deployment to staging, it is automatically pushed to production. 
-A CD pipeline runs in Jenkins that checks for any new commits and automatically deploys them to production after validation.
+        for managed nodes we have to install the ssh and allow the control node to access.
 
- Feedback & Optimization:  If there’s an issue in production, it’s logged in Jira, and the development team is notified through Slack. 
- The feedback loop helps developers fix the issue in the next sprint, making the process iterative.
+After that create the inventory file in /etc/ansible/hosts if it is in the different location use -i to specify the location.
+
+        Example of the inventory: inventory.ini
+
+            [webservers] ---> Group name
+            web1.example.com
+            web2.example.com
+
+            [dbserver] 
+            192.168.1.1
+            192.168.2.1
+
+        ## we can use both 
+
+
+
+In Ansible, the term "ad-hoc" refers to one-time, quick commands or tasks that are executed on remote hosts without the need to create a playbook. Ad-hoc commands allow you to run simple tasks like managing packages, copying files, or gathering information from remote servers, all directly from the command line.
+
+Key Points About Ad-Hoc Commands:
+One-off Commands: Ad-hoc commands are typically used when you want to execute a task on a remote host or group of hosts without writing a full playbook.
+Quick Execution: These commands are executed instantly without the need for a detailed playbook, which makes them great for simple tasks or when you need to troubleshoot or make quick changes.
+Simple Syntax: Ad-hoc commands have a simple syntax, where you specify the host(s), the module to use, and the parameters for the module.
+
+
+Syntax to use Ad-hoc 
+----------------------\\\
+
+ansible <host-pattern> -i <inventory> -m <module> -a "<module-arguments>"
+
+example = ansible all -i inventory.ini -m ping
+          ansible all -i inventory.ini -m yum -a "name=nginx state=present"
+
+
+After setup the web server by usin ad-hoc command we just checked the storage usage 
+    ansible webserver -i inventory.ini -m command -a "df -h"
+
+
+By using ad hoc command we can create user 
+
+ansible 192.168.1.10 -m user -a "name=panda" -i inventory.ini
+ansible 192.168.1.10 -m command -a "id panda" -i inventory.ini
+
+
+Get to know about modules 
+---------------------------------\\\\
+
+ansible-doc -l --list of module 
+ansible-doc  user -- get detiles about modules 
+
+
+RAW command 
+--------------------------\\\\
+by using this we can install application which is not install ansible 
+
+ansible -u root -i inventory.ini ansible3.example.com --ask-pass(this is we use to ask password becasue there is not ssh) -m raw -a 'yum install python3 -y'
+
+
+Playbooks are written in YAML format. Here’s a simple playbook that installs Apache on a set of web servers.
+
+install_apache.yaml
+
+---
+- name: install Apache on Web Servers (this just name to dispaly what is happening in the automation)
+  hosts: webservers
+  become: yes (use 'Sudo ' to become the root user we can specify user like become_user: vinoth, become_method: sudo  )
+  task:
+    - name: install Apache
+      yum:
+        name: apache2
+        state: present
+    
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enable: yes
+
+
+Run the playbook:
+-----------------\\\
+
+ansible-playbook -i inventory.ini install_apache.yaml
+
+if we do not want to mentioned the inventory name then just add the inventory to ansible.cfg 
+
+ansible.cfg 
+[defaults]
+inventory = ./inventory.ini
+
+
+
+Example Copying files to server:
+
+copy_file.YAML
+---
+- name: copy a file to webservers
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: copy index.html file
+      copy: 
+        src: /local/path/index.html
+        dest: /var/www/html/index.html
+
+    ## what this do it copy the file from /local/path/index.html this location /var/www/html/index.html
+
+
+Example 4: Using Variables in Playbooks
+----------------------------------------\\\
+
+---
+- name: Install a package dynamically
+  hosts: webserver
+  become: yes or true (can one of this)
+  vars:
+    package_name: apache2
+  tasks:
+  - name: Install Apache or Nginx
+    apt:
+     name: "{{package_name}}"
+     state: present
+
+
+
+Example 5: Using Ansible Roles 
+As your playbooks grow larger, you may want to split them into reusable components called roles. Roles are a way to organize playbooks into separate directories.
+
+to create a role, use the ansible-galaxy init command 
+
+example = ansible-galaxy init myrole
+
+myrole/
+  ├── defaults/
+  ├── files/
+  ├── handlers/
+  ├── meta/
+  ├── tasks/
+  ├── templates/
+  └── vars/
+
+
+What is an Ansible Role?
+An Ansible Role is a way to organize and encapsulate playbook logic into reusable, modular components. Roles allow you to organize your tasks, variables, handlers, 
+and other resources into a structure that is easy to manage and reuse across different playbooks. This is especially useful in larger environments where you need to 
+apply the same configuration or setup to multiple servers.
+
+Roles help improve code reusability and readability by grouping together related tasks, handlers, templates, and files into well-defined directories.
+
+Modularity: Roles help break down complex tasks into smaller, reusable pieces. For instance, you might have separate roles for configuring web servers, databases, and monitoring.
+
+Reusability: Once a role is created, it can be reused across multiple playbooks, projects, or teams.
+
+Maintainability: Roles make it easier to maintain and extend automation. If a role is properly structured, it is easier to troubleshoot and update.
+
+Collaboration: Roles help different teams (e.g., DevOps, sysadmins, etc.) collaborate by working on distinct roles rather than modifying the same monolithic playbook.
+
+
+Scenario:
+------------------==================\\\\\\\\\\\\\\\\\\\\\\\\
+You want to create a role to configure an Nginx web server. The role should:
+
+Install the Nginx package.
+Use a template to configure the Nginx configuration file.
+Copy a custom index HTML file to the web server.
+Start and enable the Nginx service.
+
+First, we need to create the necessary directory structure for the role. 
+
+roles/
+  nginx_server/
+    defaults/
+      main.yml
+    files/
+      index.html
+    handlers/
+      main.yml
+    tasks/
+      main.yml
+    templates/
+      nginx.conf.j2
+    vars/
+      main.yml
+
+
+roles/nginx_server/defaults/main.yml (Set default variables)
+
+---
+server_name: example.com
+webroot: /usr/share/nginx/html
+
+roles/nginx_server/files/index.html (Static index file)
+
+<html>
+<head><title>Welcome to {{ server_name }}</title></head>
+<body>
+  <h1> Hello from {{ server_name }}</h1>
+</body>
+</html>
+
+
+roles/nginx_server/handlers/main.yml  ( Define Handlers)
+
+Here we telling if the config file change restart the nginx
+
+---
+- name: restart nginx server
+  service:
+    name: nginx
+    state: restarted
+
+
+
+roles/nginx_server/tasks/main.yml (Define Tasks)
+---
+- name: Install nginx
+  yum:
+    name: nginx
+    state: present
+  become: true
+
+- name: copy the index file to web root 
+  copy:
+    src: index.html
+    dest: {{"webroot"}}/index.html
+  notify:
+   - restart nginx
+  become: true
+
+- name: Template the Nginx configuration file
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - restart nginx
+  become: true
+
+- name: Ensure Nginx is started and enabled
+  service:
+    name: nginx
+    state: started
+    enable: true
+  become: true 
+
+
+roles/nginx_server/templates/nginx.conf.j2 (Nginx Configuration Template)
+
+Server {
+  listen 80;
+  server_name {{ server_name }}
+
+  location / {
+    root {{ webroot }} 
+    index index.html;
+  }
+}
+
+
+
+Using the Role in a Playbook
+-----------------------------\\\\
+
+nginx_setup.yaml
+
+---
+- name: installing nginx
+  hosts: webservers
+  become: true
+  roles:
+    - nginx_server
+
+
+
+after that run the ansible-playbook nginx_server.yaml -i inventory.ini
+
+
+
+
+
+Example of Targeting Multiple OS Families
+------------------------------------------\\\\\
+
+---
+- name: Install web server depending on OS family
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Nginx on Debian-based systems
+      apt:
+        name: nginx
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Apache on RedHat-based systems
+      yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+what happen here it install the service once the fact is meet that mean if the traget system os is Debian then it install nginx if the system is redhat than only it install the Redhat
+
+
+Inventory File (inventory.ini):
+[my_servers]
+host1.example.com
+host2.example.com
+host3.example.com
+host4.example.com
+
+
+Defaults File (defaults/main.yml):
+
+server_names:
+  - host1.example.com
+  - host4.example.com
+  - host3.example.com
+---
+- name: Print the server names on specific hosts
+  hosts: "{{ server_names }}"  # This uses the server names defined in defaults/main.yml
+  gather_facts: no
+  tasks:
+    - name: Print the server name
+      debug:
+        msg: "This is {{ inventory_hostname }}"
+
+
+output:
+
+host1.example.com | SUCCESS | rc=0 >>
+This is host1.example.com
+
+host4.example.com | SUCCESS | rc=0 >>
+This is host4.example.com
+
+host3.example.com | SUCCESS | rc=0 >>
+This is host3.example.com
+
+
+--------------------------------------------------------------------------------------
+
+Curl the website:
+This task uses the curl command to send an HTTP request to http://localhost. The register: curl_output part saves the output of the curl command into a variable (curl_output).
+
+curl_output.stdout will contain the HTML content (or output) returned by the website.
+failed_when: curl_output.rc != 0 ensures that the task fails if the curl command doesn’t return a successful response (non-zero return code).
+Show the curl output:
+This debug task will print the output of the curl command to the console.
+
+
+
+    - name: Test the website by curling the homepage
+      command: curl http://localhost
+      register: curl_output
+      failed_when: curl_output.rc != 0  # Make the task fail if curl is unsuccessful
+
+    - name: Show the curl output
+      debug:
+        msg: "The website output is: {{ curl_output.stdout }}"
+
+
+
