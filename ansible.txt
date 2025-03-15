@@ -634,11 +634,11 @@ by using this we can easly copy the service to machecin and install
         - name: checking mysql is running
           debug:
             msg: "My sql is already running"
-          when: "'mysql' in ansible.fact.service or ansible.fact.service['mysql'].state == 'running' "
+          when: "'mysql' in ansible_fact.service or ansible_fact.service['mysql'].state == 'running' "
         - name: check mysql is not running
           debug: 
             msg: "My sql is already running"
-          when: "'mysql' in ansible.fact.service or ansible.fact.service['mysql'].state != 'running'" 
+          when: "'mysql' in ansible_fact.service or ansible_fact.service['mysql'].state != 'running'" 
 
 
 if we wan to check if a particular service is running or not we can use this 
