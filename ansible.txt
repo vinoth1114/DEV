@@ -87,6 +87,26 @@ After setup the web server by usin ad-hoc command we just checked the storage us
     ansible webserver -i inventory.ini -m command -a "df -h"
 
 
+By using ad hoc command we can create user 
+
+ansible 192.168.1.10 -m user -a "name=panda" -i inventory.ini
+ansible 192.168.1.10 -m command -a "id panda" -i inventory.ini
+
+
+Get to know about modules 
+---------------------------------\\\\
+
+ansible-doc -l --list of module 
+ansible-doc  user -- get detiles about modules 
+
+
+RAW command 
+--------------------------\\\\
+by using this we can install application which is not install ansible 
+
+ansible -u root -i inventory.ini ansible3.example.com --ask-pass(this is we use to ask password becasue there is not ssh) -m raw -a 'yum install python3 -y'
+
+
 Playbooks are written in YAML format. Here’s a simple playbook that installs Apache on a set of web servers.
 
 install_apache.yaml
@@ -330,4 +350,296 @@ Example of Targeting Multiple OS Families
 
 what happen here it install the service once the fact is meet that mean if the traget system os is Debian then it install nginx if the system is redhat than only it install the Redhat
 
+
+Inventory File (inventory.ini):
+[my_servers]
+host1.example.com
+host2.example.com
+host3.example.com
+host4.example.com
+
+
+Defaults File (defaults/main.yml):
+
+server_names:
+  - host1.example.com
+  - host4.example.com
+  - host3.example.com
+---
+- name: Print the server names on specific hosts
+  hosts: "{{ server_names }}"  # This uses the server names defined in defaults/main.yml
+  gather_facts: no
+  tasks:
+    - name: Print the server name
+      debug:
+        msg: "This is {{ inventory_hostname }}"
+
+
+output:
+
+host1.example.com | SUCCESS | rc=0 >>
+This is host1.example.com
+
+host4.example.com | SUCCESS | rc=0 >>
+This is host4.example.com
+
+host3.example.com | SUCCESS | rc=0 >>
+  This is host3.example.com
+
+
+--------------------------------------------------------------------------------------
+
+Curl the website:
+This task uses the curl command to send an HTTP request to http://localhost. The register: curl_output part saves the output of the curl command into a variable (curl_output).
+
+curl_output.stdout will contain the HTML content (or output) returned by the website.
+failed_when: curl_output.rc != 0 ensures that the task fails if the curl command doesn’t return a successful response (non-zero return code).
+Show the curl output:
+This debug task will print the output of the curl command to the console.
+
+
+
+    - name: Test the website by curling the homepage
+      command: curl http://localhost
+      register: curl_output
+      failed_when: curl_output.rc != 0  # Make the task fail if curl is unsuccessful
+
+    - name: Show the curl output
+      debug:
+        msg: "The website output is: {{ curl_output.stdout }}"
+
+
+
+If you want to write the script with out indentation write this kind of code then it will help full
+
+in ~/.vimrc
+autocmd FileType yaml setlocal ai ts=2 sw=2 et 
+
+ansible-playbook --syntax-check vsftpd.yml  ---> then you can verify yml file 
+
+-v[VVV] to increase output verbosity
+---------------------------------------\\\\\\
+
+-v will show task results
+-vv will show task results and task configuration
+-vvv also show information about connections to managed hosts
+-vvvv adds information about plug-ins, users used to run scripts and names of scripts that are executed
+
+
+
+Variables
+--------------------\\\\\\
+Variables can be set at different levels
+in a playbook
+in inventory (do not use)
+in inclusion files
+
+in a playbook: (this is the way add the variable in play book)
+  - hosts: all
+    vars:
+      web_package: httpd
+
+in included from playbook
+- hosts: all
+  vars_files:
+    - vars/users.yaml
+
+in inventory (do not use)
+[server]
+web1.example.com web_package=httpd
+
+
+directories can be written in two ways.
+-------------------------------------------\\\\
+users:
+  linda:
+    username:linda
+    shell:/bin/bash
+  lisa:
+    username:lisa
+    shell:/bin/bash
+
+or as:
+  users:
+    linda:{username:'linda',shell:'/bin/bash'}
+    lisa:{username:'linda',shell:'/bin/bash'}
+
+
+Using directories//////////////
+
+variable_name['key'], as in users['linda']['shell']
+variable_name.key, as in users.linda.shell
+
+in directories we can not use loop
+
+example
+-------------\\\\\\\\\\\\\
+vars/users-directories.yaml
+users:
+  linda:
+    username:linda
+    shell:/bin/bash
+  lisa:
+    username:lisa
+    shell:/bin/bash
+
+multiple-userlist.yaml
+---
+- name: show the list of the user in directories
+  hosts: ansible1.example.com
+  vars_files:
+    vars/users-directories.yaml
+  takss:
+    - name: print the directories values
+      debug:
+        msg:  "User {{ users.linda.username }} has shell {{ users.linda.shell }}"
+
+
+Using Array(list)
+------------------\\\\\\\
+users:
+- username:linda
+  shell:/bin/bash
+- username:lisa
+  shell:/bin/bash
+
+{{variable_name[0]}}
+
+in this we can loop
+
+vars/users-list.yaml
+users:
+  - username: linda
+    homedir: /home/linda
+    shell: /bin/bash
+  - username: lisa
+    homedir: /home/lisa
+    shell: /bin/bash
+
+multiple_user_list.yaml
+---
+- name: show the lists also know as Array
+  hosts: ansible1.example.com
+  vars_files:
+    - vars/users-list.yaml
+  tasks:
+    - name: print array values
+      debug:
+        msg: "user {{ item.username }} has home dir {{ item.homedir }} and shell {{ item.shell }}"
+      loop: "{{ users }}"
+    - name: print the first name
+      debug:
+        msg: "The second array is {{ users[0]}}"
+
+  
+
+Ansible vault 
+----------------\\\\\\\\\\\\
+
+To encrypted file use "ansible-vault create playbook.yaml"
+
+we have to make sure this file is protected in another way: ansible-vault create --vault-password-file=vault-pass playbook.yaml
+
+To view a vault encrypted file, use ansible-vault view playbook.yaml
+
+To edit, use ansible-vault edit playbook.yaml
+
+use ansible-vault encrypt playbook.yaml to encrypt an existing file, and use ansible-vault decrypt playbook.yaml
+
+to change the password on an existing file, use ansible-vault rekey
+
+example:
+  playbook.yaml
+---
+- name: create a user
+  hosts: all
+  vars_files:
+    - secret.yaml
+  tasks:
+    - name: create users
+      user:
+        name: " {{ username }} "
+        password: " {{password}} "
+
+
+now we are going to create valut file 
+
+ansible-valut create secret.yaml
+enter password
+again
+
+secret.yaml
+
+username: lisa
+password: password
+
+ansible-playbook --ask-valut-pass playbook.yaml 
+enter valut password
+
+
+fact
+--------------\\
+in fact we can collect the systme detailes 
+
+To check if the service is already running before starting it, 
+we can use Ansible's service_facts module, which gathers facts about the state of services on the host. 
+After that, you can conditionally check whether the service is running and take action accordingly.
+
+Example:
+
+----
+- name: show facts
+  hosts: all
+  tasks:
+    - name: print facts
+      debug:
+        var: ansible_facts
+
+
+ansible_facts['hostname']
+ansible_facts['interface']
+
+gether_facts:no (is disabling fact gethering)
+
+ansible hostname -m setup -a "filter=ansible_local" to disbale local detiales 
+
+example: customer fact
+localfacts.fact
+[localfacts]
+package = vsftpd
+service = vsftpd
+state = started
+
+facts.yaml
+--- name: install the customer fact 
+    hosts: ansible.example.com
+    vars:
+      remote_fact: /etc/ansible/facts.d
+      local_fact: localfacts.fact
+    tasks:
+      - name: crate the fact directories
+        file:
+          state: directory
+          recurse: yes
+          path: "{{ remote_fact }}"
+      - name: create the local fact
+        copy:
+          src: "{{ local_fact }}"
+          dest: "{{ remote_fact }}"
+by using this we can easly copy the service to machecin and install 
+
+
+ - name: check is the mysql is running or not 
+      service_fact:
+        - name: checking mysql is running
+          debug:
+            msg: "My sql is already running"
+          when: "'mysql' in ansible.fact.service or ansible.fact.service['mysql'].state == 'running' "
+        - name: check mysql is not running
+          debug: 
+            msg: "My sql is already running"
+          when: "'mysql' in ansible.fact.service or ansible.fact.service['mysql'].state != 'running'" 
+
+
+if we wan to check if a particular service is running or not we can use this 
 
