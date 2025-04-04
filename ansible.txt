@@ -643,3 +643,114 @@ by using this we can easly copy the service to machecin and install
 
 if we wan to check if a particular service is running or not we can use this 
 
+
+multiple conditional
+--------------\\\\
+
+when: ansible_distribution == "Centos" or ansible_distribution == "RedHat"
+when: ansible machine == "86_64" and ansible_distribution == "Redhat"
+
+
+
+Using block
+-------------\\\\\
+
+----
+- name: Simple Block example  (in this example what it do it install the http only redhat based os if it is not redhat based os then it will skip the machine)
+  hosts: all
+  tasks:
+    - name: setting up http
+      block: 
+        - name: install httpd
+          yum:
+            name: httpd
+            state: latest
+        - name: restart
+          service:
+            name: httpd
+            state: started
+      when: ansible_distribution == "RedHat"
+
+example 2:
+---
+- name: using block
+  hosts: all  
+  tasks:
+    - name: intended to be successful
+      block:
+        - name: remove a file
+          shell:
+            cmd: /usr/bin/rm /var/www/html/index.html
+      rescue: (in this the rescue only run if the block module failes if the block module success then it will skip the rescue )
+        - name: create a file
+          shell:
+            cmd: /usr/bin/touch /tmp/rescuefile
+      always:  (in this it will always run the weather the block modules is run or not )
+        - name: always write a message to logic 
+          shell:
+            cmd: /usr/bin/logger hello    
+
+Dealing with failure
+----------------------\\\\\\\\\\\
+ignore_errors = it will ignore the error mesage 
+
+
+
+File moduel:
+---
+- name: Create a file 
+  hosts: all
+  tasks:
+    - name: create a file 
+      file:
+        path: /tmp/removeme
+        owner: ansible
+        mode: 0640
+        state: touch
+        setype: public_content_rw_t
+
+blockinfile module:
+- name:
+  blockinfile:
+    path: /tmp/hosts
+    block: |
+      192.168.4.110 host1.example.com
+      192.168.4.120 host2.example.com
+    state: present
+
+fetch module:
+- name: fetch a file 
+  fetch:
+    src: /tmp/hosts 
+    dest: /tmp
+  
+Set Selinux module
+---
+- name: show Selinux
+  hosts: all
+  tasks:
+  - name: install required package
+    yum:
+      name: policycoreutils-python-utils
+      state: present
+  - name: set Selinux context
+    sefcontext:
+      traget: /tmp/removeme
+      setype: tmp_t
+      state: present
+    notify:
+      - run restorecon
+  handlers:
+  - name: run restorecon
+    command: restoreconf -v /tmp/removeme
+
+
+jinja2 dynamic
+{% for host in group['all'] %}
+{{hostvars[host] ['ansible_facts'] ['default_ipv4'] ['address']}} {{ hostvars[host] ['ansible_facts']['fqdn'] }} {{ hostvars[host] ['ansible_facts'] ['hostname']}}
+{% endfor %}
+
+in this group all mean inventory_hostname and hostvars is a default code in
+ansible and ansible_facts mean it capture the alll detailes of the host and the address fqdn host name filter the detaile from ansible_facts out and display 
+
+for more code we have ansible doucmentaion 
