@@ -1,0 +1,110 @@
+this is my scenario i have one account global in that account i have already integrate the log from server to global data dog account now what i  want to do i want to filter some log from there and want to create a new dd dash board to another dd account called asia how to do this with out any issue  
+
+ChatGPT said:
+To achieve this scenario, where you have logs in a global Datadog account and you want to filter and create a new Datadog dashboard in a separate Asia Datadog account, you would need to consider the following steps:
+
+1. Understand Datadog Account Structure
+Datadog doesn’t natively support sharing dashboards or logs directly between accounts, but there are ways to replicate the data or integrate it in a way that you can filter logs in the global account and display them in another account. Here's how you can go about it:
+
+Global Account: You have logs from your servers sent to a global Datadog account.
+
+Asia Account: You want to filter logs from the global account and create a dashboard in this separate Asia account.
+
+2. Option 1: Use Log Forwarding
+You can forward logs from the Global Datadog account to the Asia Datadog account. This is useful if you want to replicate the filtered logs into the Asia account for dashboard creation.
+
+Steps:
+Set Up Log Forwarding:
+
+In the Global account, go to Logs > Log Pipelines.
+
+Create a new pipeline or modify an existing one to filter the logs you want to forward.
+
+Use Log Forwarding to send those filtered logs to the Asia account.
+
+You'll need to set up an API key or other authentication method to forward logs to the Asia Datadog account.
+
+Forward Logs from Global Account to Asia Account:
+
+You can use Datadog’s API to forward logs between accounts. This can be done programmatically by setting up a forwarding process via the Datadog API.
+
+For example, you can use the POST API request to forward logs to a different Datadog account: Datadog Log API.
+
+Set Up a Custom Log Integration:
+
+In the Asia Datadog account, configure an incoming integration to receive the logs forwarded from the Global account. Once the logs are forwarded, you can apply filters and use them in a custom dashboard.
+
+Create a Dashboard in the Asia Account:
+
+After logs are available in the Asia account, go to Dashboards and create a new dashboard.
+
+You can use widgets like Timeseries or Log Query to visualize logs and metrics based on the forwarded logs.
+
+3. Option 2: Use Datadog Cross-Account Dashboard Sharing (Limited)
+While Datadog doesn't allow direct sharing of logs between accounts, you can share the dashboard itself with another account, provided the accounts are part of the same organization or team (if using Enterprise or Pro features). However, this won't allow you to directly filter logs across different Datadog accounts.
+
+Steps:
+Create a Dashboard in the Global Account:
+
+You can create a dashboard in the Global account with filters and queries to display only the logs you want.
+
+Share the Dashboard:
+
+If the accounts are under the same organization, you can share the dashboard with users from the Asia account. However, this won’t show logs unless the Asia account also has access to those logs.
+
+Set Permissions:
+
+Ensure that users from the Asia account are given the right permissions (read access to the dashboard or log queries).
+
+4. Option 3: Use Datadog Log-Based Metrics Across Accounts
+If you're only interested in metrics derived from the logs, you can create log-based metrics in the Global account and then use Datadog APIs to transfer the metric data to the Asia account.
+
+Steps:
+Create Log-Based Metrics in Global Account:
+
+In the Global account, use Log Explorer to create log-based metrics that capture the log data you want to filter and monitor.
+
+These metrics will be the foundation for your dashboard.
+
+Use Datadog API to Push Metrics to Asia Account:
+
+Using Datadog’s API, you can push the created metrics from the Global account to the Asia account.
+
+You can create an API integration to forward metric data from the Global account to the Asia account.
+
+Build Dashboards in Asia Account:
+
+Once the metrics are available in the Asia account, create a dashboard using those metrics.
+
+You can use timeseries widgets, or other visualizations to display the metrics coming from the Global account.
+
+5. Consider Using a Centralized Logging System
+If the solution above doesn’t fit your needs, consider using a centralized logging system that integrates both your global and Asia accounts.
+
+For example:
+
+Datadog’s centralized log management allows you to forward logs to different regions, allowing you to maintain logs in a specific region but still view them in a central location.
+
+You can use services like AWS Kinesis, AWS Lambda, or Datadog Log Forwarding integrations to create a centralized logging pipeline that forwards logs to multiple Datadog accounts.
+
+Summary of Key Steps:
+Filter Logs in the Global account and forward them to the Asia account using the Datadog API or Log Forwarding.
+
+Set up a new Dashboard in the Asia account to display those logs using custom queries or log-based metrics.
+
+If sharing dashboards is necessary, consider using cross-account read permissions if within the same organization or team.
+
+Use API integrations to share metrics or logs between accounts for cross-account visibility.
+
+By following these approaches, you should be able to filter logs from your Global Datadog account and create a new Asia Datadog dashboard without issues.
+
+
+videos
+
+In data dog apm monitring help to find internal traces time 
+
+synthetic monitroing is used to monitro end point availabllity by sending a api request 
+
+
+
+
