@@ -1,1 +1,10 @@
+To start the shiping port in the docker run this commnand
 
+minikube start driver=docker
+
+starts a local Kubernetes cluster using Docker as the runtime/driver.
+
+there is some checks during this clusert start it check is the docker is installed or not and is the permission is ok for this user and 
+it pull the kubernetes and create docker container and act as a control panel.
+
+and it check the network configurations inside the kubernets and enable the DNS such thinks 
