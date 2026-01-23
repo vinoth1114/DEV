@@ -9,6 +9,7 @@ it pull the kubernetes and create docker container and act as a control panel.
 
 and it check the network configurations inside the kubernets and enable the DNS such thinks 
 
+--------------------------------------------------------------
 
 Component	Talks to...	About what?
 Scheduler	API Server	"Which node has space for this pod?"
@@ -16,3 +17,47 @@ Controller Manager	API Server	"Are there still 3 copies running like the user as
 Kubelet	API Server	"I'm ready! Do you have any pods assigned to me?"
 Kube-Proxy	API Server	"Did any IP addresses change for the services?"
 Etcd	Only API Server	"I will save this information for you."
+
+
+
+how kubernetes works:
+------------------------------------------
+
+kubectl
+  ↓
+API Server
+  ↓
+etcd (desired state stored)
+  ↓
+Scheduler (chooses node)
+  ↓
+API Server updates Pod
+  ↓
+kubelet (on worker node)
+  ↓
+container runtime (pull image & run container)
+  ↓
+kubelet updates status → API Server → etcd
+
+-------------------------------------------------------------------------------------------------------------------
+
+You write a YAML file that describes what you want (e.g., an nginx container).
+
+You apply it using kubectl, which sends the request to the API Server.
+
+The API Server validates the YAML and stores the desired state in etcd.
+
+The Scheduler watches for new Pods and selects the best worker node for them.
+
+The kubelet on that worker node sees the Pod assigned to it.
+
+The kubelet asks the container runtime (Docker/containerd) to pull the image and start the container.
+
+The kubelet reports the Pod status back to the API Server, which updates etcd.
+
+kube-proxy manages networking by routing traffic from Services to the correct Pods.
+
+
+
+
+
