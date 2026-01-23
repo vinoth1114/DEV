@@ -8,3 +8,11 @@ there is some checks during this clusert start it check is the docker is install
 it pull the kubernetes and create docker container and act as a control panel.
 
 and it check the network configurations inside the kubernets and enable the DNS such thinks 
+
+
+Component	Talks to...	About what?
+Scheduler	API Server	"Which node has space for this pod?"
+Controller Manager	API Server	"Are there still 3 copies running like the user asked?"
+Kubelet	API Server	"I'm ready! Do you have any pods assigned to me?"
+Kube-Proxy	API Server	"Did any IP addresses change for the services?"
+Etcd	Only API Server	"I will save this information for you."
