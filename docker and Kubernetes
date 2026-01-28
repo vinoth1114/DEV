@@ -110,6 +110,9 @@ kubectl describe pod <pod name>
 --------------------------------------------------------
 Node-level checks (when needed)
 
+kubectl get nodes
+kubectl describe node <node-name>
+* Useful if pods fail only on certain nodes.
 
 
 
