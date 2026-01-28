@@ -56,8 +56,11 @@ The kubelet asks the container runtime (Docker/containerd) to pull the image and
 The kubelet reports the Pod status back to the API Server, which updates etcd.
 
 kube-proxy manages networking by routing traffic from Services to the correct Pods.
-
-
-
+-----------------------
+-------------------------
+To start the minikube run this comand 
+  <minikube start driver=docker> 
+  To check the status 
+  < minikube status >
 
 
