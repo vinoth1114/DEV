@@ -166,3 +166,6 @@ If you see two IP addresses listed there, it means the Service is successfully "
 --------------------------------------------------------------------------------
 run this command to get the url 
  minikube service spy-service --url
+--------------------------------------------------------------------------------------
+In your terminal, delete one of your pods: kubectl delete pod [NAME_OF_ONE_POD]
+----------------------------------------------------------------------------------
