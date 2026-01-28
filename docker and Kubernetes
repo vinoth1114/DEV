@@ -85,7 +85,17 @@ Full configuration of the pod
 kubectl get pod my-pod -o yaml 
 
 Use this when:
-*You want to see env vars, volumes, probes
-*Debug readiness / liveness probes
-*Check resource limits/requests
-*Compare desired vs actual state
+* You want to see env vars, volumes, probes
+* Debug readiness / liveness probes
+* Check resource limits/requests
+* Compare desired vs actual state
+
+------------------> ERRORS ----------------->
+---------- Debug based on pod STATUS -------
+*** CrashLoopBackOff:
+kubectl logs <pod name>
+
+
+
+
+
