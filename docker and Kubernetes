@@ -156,4 +156,13 @@ ports:
     targetPort: 9113
     nodePort: 32002
 
+---------------------------------------------------------------------
 
+TO Check the "Endpoints": This is a "Master" command. It shows you if the Service successfully found your pods.
+
+kubectl get endpoints spy-service --> by using this we can see the ip address 
+
+If you see two IP addresses listed there, it means the Service is successfully "Load Balancing" between your two pods!
+--------------------------------------------------------------------------------
+run this command to get the url 
+ minikube service spy-service --url
