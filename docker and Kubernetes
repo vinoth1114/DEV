@@ -67,3 +67,8 @@ To start the minikube run this comand
 Watch pod status live
 kubectl get pods -w
 ---------------------------------------
+kubectl get pods -o wide 
+This also same as "kubectl get pods -w but it provide some more additional detailes"
+Ip, NODE,NOminnated NODE, Readiness Gates 
+---------------------------------------------------
+
