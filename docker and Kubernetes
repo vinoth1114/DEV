@@ -169,3 +169,9 @@ run this command to get the url
 --------------------------------------------------------------------------------------
 In your terminal, delete one of your pods: kubectl delete pod [NAME_OF_ONE_POD]
 ----------------------------------------------------------------------------------
+
+kubectl scale deployment spy-station --replicas=10 -- > in this command we can scale up the 
+pods for temp 
+
+kubectl scale deployment spy-station --replicas= 2
+
