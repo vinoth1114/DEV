@@ -71,4 +71,11 @@ kubectl get pods -o wide
 This also same as "kubectl get pods -w but it provide some more additional detailes"
 Ip, NODE,NOminnated NODE, Readiness Gates 
 ---------------------------------------------------
+Best command for debugging
+kubectl describe pod my-pod
 
+* Why the pod is failing or restarting
+* Image pull errors
+* Resource issues (CPU / memory)
+* Node where it’s scheduled
+--------------------------------------------------------------
