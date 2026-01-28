@@ -94,6 +94,25 @@ Use this when:
 ---------- Debug based on pod STATUS -------
 *** CrashLoopBackOff:
 kubectl logs <pod name>
+kubectl logs <pod name> --previous 
+  * (start -- > crashes --> restarts)
+
+*** Pending:
+*** ImagePullBackOff
+*** Running but not READY
+kubectl describe pod <pod name>
+
+** Common causes:
+* Not enough CPU/memory
+* NodeSelector / affinity mismatch
+* PVC not bound
+
+--------------------------------------------------------
+Node-level checks (when needed)
+
+
+
+
 
 
 
