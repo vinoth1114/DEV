@@ -63,4 +63,7 @@ To start the minikube run this comand
   To check the status 
   < minikube status >
 
-
+----------------------------------------
+Watch pod status live
+kubectl get pods -w
+---------------------------------------
