@@ -175,3 +175,15 @@ pods for temp
 
 kubectl scale deployment spy-station --replicas= 2
 
+------------------------------------------------------------------------
+kubectl apply -f spy-pv.yaml --dry-run=client --> validate before deploye
+
+to edit the pv 
+kubectl edit pv spy-storage-pv 
+chnage the capacity 
+
+kubectl edit pvc spy-storage-pvc
+chnage the capacity
+
+after chage "kubectl rollout restart deployment spy-station" run this command to get apply
+
